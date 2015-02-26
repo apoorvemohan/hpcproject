@@ -1,0 +1,36 @@
+TIMING:
+16	800000	1.00e-06	1
+Time Step 0
+Processor 0
+	Total Time = 4018157
+Processor 1
+	Total Time = 4023989
+Processor 2
+	Total Time = 4017480
+Processor 3
+	Total Time = 4052318
+Processor 4
+	Total Time = 4026937
+Processor 5
+	Total Time = 4068733
+Processor 6
+	Total Time = 4028553
+Processor 7
+	Total Time = 4046525
+Processor 8
+	Total Time = 4054399
+Processor 9
+	Total Time = 4048077
+Processor 10
+	Total Time = 4074510
+Processor 11
+	Total Time = 4062305
+Processor 12
+	Total Time = 4057571
+Processor 13
+	Total Time = 4050950
+Processor 14
+	Total Time = 4032379
+Processor 15
+	Total Time = 4034210
+END
