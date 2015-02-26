@@ -32,8 +32,6 @@ def group_exec_completed(app_statfile_list):
 
 def group_exec_completed1(app_statfile_list, runnable):
 
-	print runnable
-
 	u.loginfo("In Group Exec Completed1")
 	global totalthreads, groupthreads, runnable1
 
@@ -43,7 +41,6 @@ def group_exec_completed1(app_statfile_list, runnable):
 		app = app_statfile_list[i]
 		i += 1
 		x = app[0].poll()
-		print 'X: ' + str(x)
 		if (x == 0) or (not os.path.exists('/proc/' + str(app[0].pid))):
 			i -= 1
 			app[1].close()
