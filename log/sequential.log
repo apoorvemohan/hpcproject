@@ -1,2 +1,0 @@
-[2015-02-26 02:59:54 INFO] Begin Time:  2015-02-26 02:59:54
-[2015-02-26 02:59:54 INFO] Executing echo "1.5e-16 216 90000 6 0 0 10000 0 16 6.212752" > /tmp/input ; /home/apoorve/hpcproject/splash2_bench/codes/apps/water-nsquared/WATER-NSQUARED < /tmp/input
