@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+
+import os
+import time
+import sys
+
+path = os.path.dirname(os.path.realpath(__file__))  + '/..'
+sys.path.insert(0, path)
+
+import common.imports.utils as u
+import common.imports.constants as c
+import common.imports.dmtcp_utils as du
+
+def setup_for_restart(chkptdir):
+	fp = open(chkptdir + '/dmtcp_env.txt', 'w')
+	fp.write('STATFILE=$STATFILE\n')
+	fp.write('STATGEN=$STATGEN\n')
+        fp.close()
+
+def get_runnable_instance_map(appinstancedir):
+        runnable_instance_map = {}
+        for instance in os.listdir(appinstancedir):
+                runnable_instance_map.update(u.getidcmdpairbyxml(appinstancedir + '/' + instance))
+        return runnable_instance_map
+
+def main():
+
+	CHKPTDIR = None
+	APPINSTANCEDIR = None
+
+	if (len(sys.argv) == 1) or (sys.argv[1] == ''):
+		u.logerr('INVALID ARGUMENT SUPPLIED!!!')
+		sys.exit(0)
+
+	if (sys.argv[1] == '-s') or (sys.argv[1] == '--seq'):
+		CHKPTDIR = c.SEQ_DMTCP_CHKPTS_DIR
+		APPINSTANCEDIR = c.SEQ_DMTCP_APP_INSTANCE_DIR
+	elif (sys.argv[1] == '-p') or (sys.argv[1] == '--parallel'):
+                CHKPTDIR = c.PARALLEL_DMTCP_CHKPTS_DIR
+                APPINSTANCEDIR = c.PARALLEL_DMTCP_APP_INSTANCE_DIR
+
+	if os.path.isdir(CHKPTDIR):
+		os.rename(CHKPTDIR, CHKPTDIR + '.' + u.gettimestamp().replace(' ', '_'))
+		u.loginfo('chkpt dir archieved')
+	os.mkdir(CHKPTDIR)
+
+	runnable = get_runnable_instance_map(APPINSTANCEDIR)
+	for key in runnable.keys():
+		u.loginfo('[Starting ' + key + ' : ' + runnable[key] + ']')
+		os.mkdir(CHKPTDIR + '/' + str(key))
+		u.execcmd('touch ' + CHKPTDIR + '/' + str(key) + '/command')
+		u.execcmd('echo \"' + runnable[key] + '\" >> ' + CHKPTDIR + '/' + str(key) + '/command')
+		chkptnum = 0
+		if len(u.listonlydir(CHKPTDIR + '/' + str(key))) > 0:
+			chkptnum = int(max(u.listonlydir(CHKPTDIR + '/' + str(key)))) + 1
+		else:
+			chkptnum = 1
+		chkptnum = 1
+		if not os.path.isdir(CHKPTDIR + '/' + str(key) + '/' + str(chkptnum)):
+			os.mkdir(CHKPTDIR + '/' + str(key) + '/' + str(chkptnum))
+		port = None
+		cwd = u.getcwd()
+		if (sys.argv[1] == '-p') or (sys.argv[1] == '--parallel'):
+			setup_for_restart(CHKPTDIR + '/' + str(key) + '/' + str(chkptnum))
+		u.chdir(CHKPTDIR + '/' + str(key) + '/' + str(chkptnum))
+		os.system('cp ' + c.BASE + '/random.in .')
+		port = u.getopenport()
+
+		if (sys.argv[1] == '-s') or (sys.argv[1] == '--seq'):
+			du.launch(runnable[key], None, '--newcoordinator', '--port ' + str(port), None, '--daemon')
+		elif (sys.argv[1] == '-p') or (sys.argv[1] == '--parallel'):
+			du.launch(runnable[key], '--with-plugin myplug', '--newcoordinator', '--port ' + str(port), '--modify-env', '--daemon')
+		time.sleep(60)
+		du.chkpt('--port ' + str(port), '-b')
+		u.loginfo('after checkpoint')
+		du.kill('--port ' + str(port))
+		u.loginfo('after kill')
+		u.chdir(cwd)
+
+if __name__ == '__main__':
+	c.LOGGER = 'init_app_and_chkpt.log'
+	u.loginfo('Begin Time:  ' + u.gettimestamp())
+	main()
+	u.loginfo('End Time:  ' + u.gettimestamp())
+

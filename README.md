@@ -22,3 +22,15 @@ HOW TO EXECUTE PHASE 2 (parallel):
 - cd DIR/hpcproject/
 - bin/sequential -r
 - logs will be created in DIR/log that contains the start and the end time of the script
+
+HOW TO EXECUTE PHASE 3 & 4:
+
+- Edit DIR/dmtcp/src/plugin/myplug/Makefile and set DMTCP_ROOT to absolute path of the dmtcp folder present in DIR i.e. DIR/dmtcp.
+- Run 'make' command in DIR/dmtcp/src/plugin/myplug dir.
+- Run ./configure && make in DIR/dmtcp dir.
+- Place xml files for all the jobs(applications) in  DIR/hpcproject/data/seq_dmtcp/appdata/app_instance_xml and DIR/hpcproject/data/parallel_dmtcp/appdata/app_instance_xml (Sample files already present)
+- cd dir/hpcproject
+- bin/init_chkpt_and_restart -s
+- bin/seq_dmtcp
+- bin/init_chkpt_and_restart -p 
+- bin/parallel_dmtcp rule6
