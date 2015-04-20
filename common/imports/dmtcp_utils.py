@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 
 
-def launch(app_cmd, plugin, newcoordinator, port, modifyenv, daemon):
+def launch(app_cmd, plugin, newcoordinator, port, modifyenv, daemon, interval, envvarmap):
 	import utils
 	import constants
+	import subprocess as s
 
-	envvarmap = {'STATFILE' : '', 'STATGEN' : ''}
+	if envvarmap == None:
+		envvarmap = {'STATFILE' : '', 'STATGEN' : ''}
 
 	cmd = 'STATFILE=' + envvarmap['STATFILE'] + ' ' + 'STATGEN=' + envvarmap['STATGEN'] + ' '
 
 	cmd += constants.DMTCP_LAUNCH 
+
+	if (interval != None) and ('-i' in interval):
+		cmd += (' ' + interval)
 
 	if (plugin != None) and ('--with-plugin' in plugin):
 		cmd += (' ' + plugin)
@@ -36,11 +41,14 @@ def launch(app_cmd, plugin, newcoordinator, port, modifyenv, daemon):
 
 	utils.loginfo('Final launch command: ' + cmd)
 
+	obj = None
+
 	if (daemon != None) and ('--daemon' == daemon):
-		utils.execcmdbg(cmd)
+		obj = s.Popen(cmd, shell=True)
 	else:
-		utils.execcmd(cmd)
+		obj = s.Popen(cmd, shell=True).wait()
 		
+	return obj
 	
 def chkpt(port, blocked):
 	import utils
@@ -103,7 +111,14 @@ def restart(chkpt_img, newcoordinator, port, daemon, interval, envvarmap):
 	cmd = 'STATFILE=' + envvarmap['STATFILE'] + ' ' + 'STATGEN=' + envvarmap['STATGEN'] + ' ' + perf_stat + cmd
 
 	utils.loginfo(cmd)	
+
+
+	obj = None
+
 	if (daemon != None) and ('--daemon' == daemon):
-                utils.execcmdbg(cmd)
-        else:
-                utils.execcmd(cmd)
+		obj = s.Popen(cmd, shell=True)
+	else:
+		obj = s.Popen(cmd, shell=True).wait()
+		
+	return obj
+

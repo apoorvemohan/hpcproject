@@ -19,7 +19,7 @@ def rule1(app_stats_map, runninglist=None):
 
 	app_stats_map = copy.deepcopy(app_stats_map)
 	next_runnable = []
-	totalthreads = m.cpu_count() * 2
+	totalthreads = m.cpu_count() * 1.5
 	toberemoved = None
 
 #	while((totalram > 0) and (totalthreads > 0) and ((len(app_stats_map)) > 0)):
@@ -244,11 +244,13 @@ def rule6(app_stats_map, runninglist):
 	if matched: 
 		totalram = int(matched.groups()[0])
 
-	totalthreads = math.ceil(ru.getcpuidleperc()/100) 
+	totalthreads = ru.getcpuidleperc() 
 	print 'TotalThreads to start: ' + str(totalthreads)
 	app_stats_map = copy.deepcopy(app_stats_map)
 	next_runnable = []
 	toberemoved = None
+
+	print 'totalram: ' + str(totalram)
 
 	if totalthreads > 0:
 		while len(app_stats_map) > 0:
@@ -257,13 +259,16 @@ def rule6(app_stats_map, runninglist):
 				tree = ET.parse(c.PARALLEL_DMTCP_APP_INSTANCE_DIR + '/' + app + '.xml')
 				root = tree.getroot()
 				thread = int(root.findall('THREADS')[0].text)
+				print 'app: ' + str(app)
 				ram = int(app_stats_map[app]['VmRSS'].split(' ')[0])
+				print 'ram: ' + str(ram)
 				if ((totalram - ram) > 0) and ((totalthreads - thread) >= 0):
 					totalram -= ram
 					totalthreads -= thread
 					next_runnable.append(app)
 			app_stats_map.pop(app)
 
+	next_runnable.extend(runninglist)
 	return next_runnable
 
 RULES = {'rule1' : rule1, 'rule2' : rule2, 'rule3' : rule3, 'rule4' : rule4, 'rule6' : rule6}

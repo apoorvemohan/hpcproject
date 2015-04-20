@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-BASE = '/home/apoorve/hpcproject'
+BASE = ''
 DMTCP = BASE + '/dmtcp'
 STRACE = BASE + '/strace'
 

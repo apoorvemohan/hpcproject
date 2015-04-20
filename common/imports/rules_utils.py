@@ -61,6 +61,8 @@ def getcpuidleperc():
 
 	totalthreads = (float(cpus) * cpuutilization) / 100.0
 
+	print 'total: ' + str(totalthreads)
+
 	if math.modf(totalthreads)[0] < 0.5:
 		return int(totalthreads)
 	else:
